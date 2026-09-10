@@ -6,7 +6,7 @@ from sqlalchemy import String, SmallInteger, ForeignKey, Enum, DateTime, func, T
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UniqueConstraint
 
-from mysite.db.database import Base
+from .database import Base
 
 class UserRole(str, PyEnum):
     player = 'player'
@@ -24,9 +24,22 @@ class UserProfile(Base):
 
     profile: Mapped[List['UserStatistic']] = relationship('UserStatistic',
                                                         back_populates='user', cascade='all, delete-orphan')
-    room_owner: Mapped[list['Room']] = relationship(back_populates='user_profile', cascade='all, delete-orphan')
-    room_memberships:  Mapped[list['RoomPlayer']] = relationship(back_populates='user_profile', cascade='all, delete-orphan')
-    reviews: Mapped[list['Review']] =  relationship(back_populates='user_profile', cascade='all, delete-orphan')
+    room_owner: Mapped[list['Room']] = relationship('Room', back_populates='owner', cascade='all, delete-orphan')
+    room_memberships:  Mapped[list['RoomPlayer']] = relationship('RoomPlayer', back_populates='user', cascade='all, delete-orphan')
+    reviews: Mapped[list['Review']] =  relationship('Review', back_populates='user', cascade='all, delete-orphan')
+    game_participations: Mapped[List['GamePlayer']] = relationship('GamePlayer', back_populates='user', cascade='all, delete-orphan')
+    achievements: Mapped[list["UserAchievement"]] = relationship('UserAchievement', back_populates="user", cascade="all, delete-orphan")
+    refresh_token: Mapped[List['RefreshToken']] = relationship('RefreshToken', back_populates='user',
+                                                             cascade='all, delete-orphan')
+
+class RefreshToken(Base):
+    __tablename__ = 'refresh_token'
+
+    id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True)
+    token: Mapped[str] = mapped_column(String, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user_profile.id'))
+
+    user: Mapped['UserProfile'] = relationship('UserProfile')
 
 class UserStatistic(Base):
     __tablename__ = 'user_statistics'
@@ -67,7 +80,8 @@ class Room(Base):
 
     owner: Mapped["UserProfile"] = relationship(back_populates="room_owner")
     players: Mapped[List["RoomPlayer"]] = relationship(back_populates="room", cascade="all, delete-orphan")
-    reviews: Mapped[list['Room']] = relationship(back_populates='room', cascade='all, delete-orphan')
+    reviews: Mapped[list['Review']] = relationship(back_populates='room', cascade='all, delete-orphan')
+    game: Mapped["Game"] = relationship(back_populates="room", cascade='all, delete-orphan')
 
 class RoomPlayer(Base):
     __tablename__ = 'room_player'

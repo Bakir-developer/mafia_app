@@ -1,22 +1,23 @@
-from socketserver import BaseServer
 from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import Text
 from pydantic import BaseModel, EmailStr
 
-from mysite.db.models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
+from .models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
 
 
-class UserProfileCreateSchema(BaseModel):
-    id: int
+class UserProfileSchema(BaseModel):
     username:str
     email: EmailStr
     age:int
-    profile_image:str
+    profile_image:Optional[str]
     role: UserRole
     password: str
 
+class LoginSchema(BaseModel):
+    username:str
+    password:str
 
 class UserStatisticSchema(BaseModel):
     username: str
@@ -49,7 +50,7 @@ class ReviewSchema(BaseModel):
     id: int
     user_id : int
     room_id: int
-    text: Text
+    text: str
     stars: int
 
 class GameSchema(BaseModel):
