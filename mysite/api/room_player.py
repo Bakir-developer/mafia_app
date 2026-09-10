@@ -55,7 +55,7 @@ async def list_room_player(room_id: Optional[int] = None, db: Session = Depends(
 async def detail_room_player(room_player_id: int, db: Session = Depends(get_db)):
     room_player_db = db.query(RoomPlayer).filter(RoomPlayer.id == room_player_id).first()
     if not room_player_db:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="room player not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="player not found")
     return room_player_db
 
 
@@ -63,7 +63,7 @@ async def detail_room_player(room_player_id: int, db: Session = Depends(get_db))
 async def delete_room_player(room_player_id: int, db: Session = Depends(get_db)):
     room_player_db = db.query(RoomPlayer).filter(RoomPlayer.id == room_player_id).first()
     if not room_player_db:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="room player not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="player not found")
     db.delete(room_player_db)
     db.commit()
     return {'status': 'success deleted'}
