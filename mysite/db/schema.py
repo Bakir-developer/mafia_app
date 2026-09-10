@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Text
 from pydantic import BaseModel, EmailStr
 
 from .models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
@@ -20,7 +19,7 @@ class LoginSchema(BaseModel):
     password:str
 
 class UserStatisticSchema(BaseModel):
-    username: str
+    user_id: int
     games_played: int
     wins: int
     losses: int

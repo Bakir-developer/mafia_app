@@ -22,8 +22,8 @@ class UserProfile(Base):
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.player)
     password: Mapped[str] = mapped_column(String)
 
-    profile: Mapped[List['UserStatistic']] = relationship('UserStatistic',
-                                                        back_populates='user', cascade='all, delete-orphan')
+    profile: Mapped[List['UserStatistic']] = relationship('UserStatistic',back_populates='user',
+                                                          cascade='all, delete-orphan')
     room_owner: Mapped[list['Room']] = relationship('Room', back_populates='owner', cascade='all, delete-orphan')
     room_memberships:  Mapped[list['RoomPlayer']] = relationship('RoomPlayer', back_populates='user', cascade='all, delete-orphan')
     reviews: Mapped[list['Review']] =  relationship('Review', back_populates='user', cascade='all, delete-orphan')
