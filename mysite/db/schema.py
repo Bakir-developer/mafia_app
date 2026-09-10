@@ -20,7 +20,7 @@ class UserProfileUpdateSchema(BaseModel):
     email: Optional[EmailStr] = None
     age: Optional[int] = None
     profile_image: Optional[str] = None
-    password: Optional[str] = None  # келсе, save алдында кайра hash кылынат
+    password: Optional[str] = None
 
 class UserProfileListSchema(BaseModel):
     id: int
@@ -57,25 +57,25 @@ class UserStatisticDetailSchema(BaseModel):
 
 class RoomCreateSchema(BaseModel):
     room_name: str
-    max_player: int
+    max_players: int
     owner_id: int
 
 class RoomUpdateSchema(BaseModel):
     room_name: Optional[str] = None
-    max_player: Optional[int] = None
+    max_players: Optional[int] = None
     status: Optional[RoomStatus] = None
 
 class RoomListSchema(BaseModel):
     id: int
     room_name: str
-    max_player: int
+    max_players: int
     status: RoomStatus
     owner_id: int
 
 class RoomDetailSchema(BaseModel):
     id: int
     room_name: str
-    max_player: int
+    max_players: int
     status: RoomStatus
     created_at: datetime
     started_at: Optional[datetime]

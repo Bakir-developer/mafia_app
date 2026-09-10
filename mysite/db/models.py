@@ -6,10 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UniqueConstraint
 
 from mysite.db.database import Base
-
 class UserRole(str, PyEnum):
     player = 'player'
     admin = 'admin'
+
 
 class UserProfile(Base):
     __tablename__ = 'user_profile'
@@ -21,11 +21,28 @@ class UserProfile(Base):
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.player)
     password: Mapped[str] = mapped_column(String)
 
-    profile: Mapped[List['UserStatistic']] = relationship('UserStatistic',
-                                                        back_populates='user', cascade='all, delete-orphan')
-    room_owner: Mapped[list['Room']] = relationship(back_populates='user_profile', cascade='all, delete-orphan')
-    room_memberships:  Mapped[list['RoomPlayer']] = relationship(back_populates='user_profile', cascade='all, delete-orphan')
-    reviews: Mapped[list['Review']] =  relationship(back_populates='user_profile', cascade='all, delete-orphan')
+    # FIX: UserStatistic.user_id unique=True болгондуктан бул one-to-one —
+    # List эмес, Optional + uselist=False. back_populates да 'user' болуш керек
+    # (UserStatistic жагында атрибут ошол атка ээ).
+    profile: Mapped[Optional['UserStatistic']] = relationship(
+        'UserStatistic', back_populates='user', uselist=False, cascade='all, delete-orphan'
+    )
+
+    # FIX: back_populates мурун 'user_profile' болчу — Room'до андай атрибут жок,
+    # чыныгы аты 'owner'.
+    room_owner: Mapped[list['Room']] = relationship(back_populates='owner', cascade='all, delete-orphan')
+
+    # FIX: back_populates мурун 'user_profile' болчу — RoomPlayer'до чыныгы аты 'user'.
+    room_memberships: Mapped[list['RoomPlayer']] = relationship(back_populates='user', cascade='all, delete-orphan')
+
+    # FIX: back_populates мурун 'user_profile' болчу — Review'до чыныгы аты 'user'.
+    reviews: Mapped[list['Review']] = relationship(back_populates='user', cascade='all, delete-orphan')
+
+    # FIX: GamePlayer.user жана UserAchievement.user мурда ушул экөөнү күтүп турган,
+    # бирок UserProfile'де такыр жазылган эмес эле — кошулду.
+    game_participations: Mapped[list['GamePlayer']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    achievements: Mapped[list['UserAchievement']] = relationship(back_populates='user', cascade='all, delete-orphan')
+
 
 class UserStatistic(Base):
     __tablename__ = 'user_statistics'
@@ -38,10 +55,11 @@ class UserStatistic(Base):
     total_game_time: Mapped[float] = mapped_column(Float, default=0)
     mafia_games: Mapped[int] = mapped_column(Integer, default=0)
     citizen_games: Mapped[int] = mapped_column(Integer, default=0)
-    detective_games: Mapped[int]= mapped_column(Integer, default=0)
-    doctor_games: Mapped[int] =mapped_column(Integer, default=0)
+    detective_games: Mapped[int] = mapped_column(Integer, default=0)
+    doctor_games: Mapped[int] = mapped_column(Integer, default=0)
 
     user: Mapped['UserProfile'] = relationship('UserProfile', back_populates='profile')
+
 
 class RoomStatus(str, PyEnum):
     WAITING = "WAITING"
@@ -66,7 +84,15 @@ class Room(Base):
 
     owner: Mapped["UserProfile"] = relationship(back_populates="room_owner")
     players: Mapped[List["RoomPlayer"]] = relationship(back_populates="room", cascade="all, delete-orphan")
-    reviews: Mapped[list['Room']] = relationship(back_populates='room', cascade='all, delete-orphan')
+
+    # FIX: мурун `Mapped[list['Room']]` деп өзүн-өзүнө шилтеме кылып жаткан — typo.
+    # Чыныгы тиби Review болуш керек.
+    reviews: Mapped[list['Review']] = relationship(back_populates='room', cascade='all, delete-orphan')
+
+    # FIX: Game.room `back_populates="game"` деп күтөт, бирок бул атрибут жок эле — кошулду.
+    # unique=True FK болгондуктан бул да one-to-one (uselist=False).
+    game: Mapped[Optional['Game']] = relationship(back_populates='room', uselist=False, cascade='all, delete-orphan')
+
 
 class RoomPlayer(Base):
     __tablename__ = 'room_player'
@@ -80,6 +106,7 @@ class RoomPlayer(Base):
 
     room: Mapped["Room"] = relationship(back_populates="players")
     user: Mapped["UserProfile"] = relationship(back_populates="room_memberships")
+
 
 class Review(Base):
     __tablename__ = 'review'
@@ -253,4 +280,3 @@ class UserAchievement(Base):
     achievement: Mapped["Achievement"] = relationship(back_populates="users")
 
     __table_args__ = (UniqueConstraint('user_id', 'achievement_id', name='uq_user_achievement'),)
-
