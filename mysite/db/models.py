@@ -1,7 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum as PyEnum
-
 from sqlalchemy import String, SmallInteger, ForeignKey, Enum, DateTime, func, Text, Integer, Float, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UniqueConstraint
