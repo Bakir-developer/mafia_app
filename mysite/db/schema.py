@@ -6,11 +6,12 @@ from pydantic import BaseModel, EmailStr
 from .models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
 
 
-class UserProfileCreateSchema(BaseModel):
-    username: str
+class UserProfileSchema(BaseModel):
+    username:str
     email: EmailStr
-    age: int
-    profile_image: Optional[str] = None
+    age:int
+    profile_image:Optional[str]
+    role: UserRole
     password: str
 
 class UserProfileUpdateSchema(BaseModel):
@@ -106,6 +107,7 @@ class RoomPlayerDetailSchema(BaseModel):
     user_id: int
 
 class ReviewCreateSchema(BaseModel):
+    user_id: int
     room_id: int
     text: Optional[str] = None
     stars: int

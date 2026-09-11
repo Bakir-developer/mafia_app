@@ -6,7 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UniqueConstraint
 from .database import Base
 
->>>>>>> origin/adina
 class UserRole(str, PyEnum):
     player = 'player'
     admin = 'admin'
