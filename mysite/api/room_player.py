@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from mysite.db.database import SessionLocal
-from mysite.db.models import RoomPlayer
+from mysite.db.models import RoomPlayer, Room, UserProfile
 from mysite.db.schema import (
     RoomPlayerCreateSchema,
     RoomPlayerListSchema,
@@ -21,7 +21,33 @@ async def get_db():
 
 
 @room_player_router.post('/create', response_model=RoomPlayerDetailSchema)
-async def create_room_player(room_player_data: RoomPlayerCreateSchema, db: Session = Depends(get_db)):
+async def create_room_player(
+    room_player_data: RoomPlayerCreateSchema,
+    db: Session = Depends(get_db)
+):
+    # 1. Проверяем Room ID
+    room = db.query(Room).filter(
+        Room.id == room_player_data.room_id
+    ).first()
+
+    if not room:
+        raise HTTPException(
+            status_code=404,
+            detail="Room not found"
+        )
+
+    # 2. Проверяем User ID
+    user = db.query(UserProfile).filter(
+        UserProfile.id == room_player_data.user_id
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # 3. Проверяем, не добавлен ли уже
     existing = (
         db.query(RoomPlayer)
         .filter(
@@ -30,16 +56,20 @@ async def create_room_player(room_player_data: RoomPlayerCreateSchema, db: Sessi
         )
         .first()
     )
+
     if existing:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="user already joined this room",
+            status_code=400,
+            detail="user already joined this room"
         )
 
+    # 4. Создаём
     room_player_db = RoomPlayer(**room_player_data.dict())
+
     db.add(room_player_db)
     db.commit()
     db.refresh(room_player_db)
+
     return room_player_db
 
 
