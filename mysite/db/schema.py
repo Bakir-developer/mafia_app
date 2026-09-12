@@ -1,18 +1,17 @@
-from socketserver import BaseServer
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Text
 from pydantic import BaseModel, EmailStr
 
-from mysite.db.models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
+from .models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
 
 
-class UserProfileCreateSchema(BaseModel):
-    username: str
+class UserProfileSchema(BaseModel):
+    username:str
     email: EmailStr
-    age: int
-    profile_image: Optional[str] = None
+    age:int
+    profile_image:Optional[str]
+    role: UserRole
     password: str
 
 class UserProfileUpdateSchema(BaseModel):
@@ -20,7 +19,7 @@ class UserProfileUpdateSchema(BaseModel):
     email: Optional[EmailStr] = None
     age: Optional[int] = None
     profile_image: Optional[str] = None
-    password: Optional[str] = None  # келсе, save алдында кайра hash кылынат
+    password: Optional[str] = None
 
 class UserProfileListSchema(BaseModel):
     id: int
@@ -36,15 +35,23 @@ class UserProfileDetailSchema(BaseModel):
     profile_image: Optional[str]
     role: UserRole
 
-class UserStatisticListSchema(BaseModel):
+class UserStatisticDetailSchema(BaseModel):
     user_id: int
     username: str
     wins: int
     games_played: int
 
-class UserStatisticDetailSchema(BaseModel):
+class UserStatisticListSchema(BaseModel):
     user_id: int
     username: str
+
+
+class LoginSchema(BaseModel):
+    username:str
+    password:str
+
+class UserStatisticSchema(BaseModel):
+    user_id: int
     games_played: int
     wins: int
     losses: int
@@ -57,25 +64,25 @@ class UserStatisticDetailSchema(BaseModel):
 
 class RoomCreateSchema(BaseModel):
     room_name: str
-    max_player: int
+    max_players: int
     owner_id: int
 
 class RoomUpdateSchema(BaseModel):
     room_name: Optional[str] = None
-    max_player: Optional[int] = None
+    max_players: Optional[int] = None
     status: Optional[RoomStatus] = None
 
 class RoomListSchema(BaseModel):
     id: int
     room_name: str
-    max_player: int
+    max_players: int
     status: RoomStatus
     owner_id: int
 
 class RoomDetailSchema(BaseModel):
     id: int
     room_name: str
-    max_player: int
+    max_players: int
     status: RoomStatus
     created_at: datetime
     started_at: Optional[datetime]
@@ -100,6 +107,7 @@ class RoomPlayerDetailSchema(BaseModel):
     user_id: int
 
 class ReviewCreateSchema(BaseModel):
+    user_id: int
     room_id: int
     text: Optional[str] = None
     stars: int
@@ -191,12 +199,14 @@ class VoteCreateSchema(BaseModel):
     voter_id: int
     target_id: int
 
+
 class VoteDetailSchema(BaseModel):
     id: int
     round_id: int
     voter_id: int
     target_id: int
     created_at: datetime
+
 
 class AchievementCreateSchema(BaseModel):
     code: AchievementCode
@@ -214,20 +224,22 @@ class AchievementListSchema(BaseModel):
     code: AchievementCode
     title: str
 
+
 class AchievementDetailSchema(BaseModel):
     id: int
     code: AchievementCode
     title: str
     description: str
 
+
 class UserAchievementListSchema(BaseModel):
     id: int
     achievement_id: int
     unlocked_at: datetime
+
 
 class UserAchievementDetailSchema(BaseModel):
     id: int
     user_id: int
     achievement_id: int
     unlocked_at: datetime
-
