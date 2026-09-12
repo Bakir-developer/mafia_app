@@ -199,12 +199,14 @@ class VoteCreateSchema(BaseModel):
     voter_id: int
     target_id: int
 
+
 class VoteDetailSchema(BaseModel):
     id: int
     round_id: int
     voter_id: int
     target_id: int
     created_at: datetime
+
 
 class AchievementCreateSchema(BaseModel):
     code: AchievementCode
@@ -222,20 +224,22 @@ class AchievementListSchema(BaseModel):
     code: AchievementCode
     title: str
 
+
 class AchievementDetailSchema(BaseModel):
     id: int
     code: AchievementCode
     title: str
     description: str
 
+
 class UserAchievementListSchema(BaseModel):
     id: int
     achievement_id: int
     unlocked_at: datetime
+
 
 class UserAchievementDetailSchema(BaseModel):
     id: int
     user_id: int
     achievement_id: int
     unlocked_at: datetime
-

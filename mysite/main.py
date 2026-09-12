@@ -1,8 +1,18 @@
 from fastapi import FastAPI
 from mysite.api import user_profile, auth, statistic, room, room_player, reviews, game, night_action
 from mysite.admin.setup import setup_admin
+from fastapi.middleware.cors import CORSMiddleware
 
 Mafia_app = FastAPI(title='FastAPI Mafia_app')
+
+Mafia_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 Mafia_app.include_router(room.room_router)
 Mafia_app.include_router(room_player.room_player_router)

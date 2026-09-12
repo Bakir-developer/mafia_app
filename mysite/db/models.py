@@ -10,7 +10,6 @@ class UserRole(str, PyEnum):
     player = 'player'
     admin = 'admin'
 
-
 class UserProfile(Base):
     __tablename__ = 'user_profile'
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -58,7 +57,6 @@ class UserStatistic(Base):
 
     user: Mapped['UserProfile'] = relationship('UserProfile', back_populates='profile')
 
-
 class RoomStatus(str, PyEnum):
     WAITING = "WAITING"
     STARTING = "STARTING"
@@ -83,9 +81,7 @@ class Room(Base):
     owner: Mapped["UserProfile"] = relationship(back_populates="room_owner")
     players: Mapped[List["RoomPlayer"]] = relationship(back_populates="room", cascade="all, delete-orphan")
 
-
     reviews: Mapped[list['Review']] = relationship(back_populates='room', cascade='all, delete-orphan')
-
 
     game: Mapped[Optional['Game']] = relationship(back_populates='room', uselist=False, cascade='all, delete-orphan')
 
@@ -101,7 +97,6 @@ class RoomPlayer(Base):
 
     room: Mapped["Room"] = relationship(back_populates="players")
     user: Mapped["UserProfile"] = relationship(back_populates="room_memberships")
-
 
 class Review(Base):
     __tablename__ = 'review'
