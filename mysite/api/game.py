@@ -148,11 +148,6 @@ async def detail_game_player(game_player_id: int, db: Session = Depends(get_db))
     return game_player_db
 
 
-# ============================================================================
-# GAME ROUND
-# (create/update/delete жок — раунддун жыйынтыгын resolveNight/resolveVoting
-#  логикасы түзөт, ал әзырынча башка эндпойнттарда/сервистерде болот)
-# ============================================================================
 
 @game_round_router.get('/list', response_model=List[GameRoundListSchema])
 async def list_game_round(game_id: Optional[int] = None, db: Session = Depends(get_db)):
