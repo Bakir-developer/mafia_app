@@ -65,10 +65,12 @@ class UserStatisticSchema(BaseModel):
 class RoomCreateSchema(BaseModel):
     room_name: str
     max_players: int
+    age: int
     owner_id: int
 
 class RoomUpdateSchema(BaseModel):
     room_name: Optional[str] = None
+    age: int
     max_players: Optional[int] = None
     status: Optional[RoomStatus] = None
 
@@ -76,6 +78,7 @@ class RoomListSchema(BaseModel):
     id: int
     room_name: str
     max_players: int
+    age: int
     status: RoomStatus
     owner_id: int
 
@@ -83,6 +86,7 @@ class RoomDetailSchema(BaseModel):
     id: int
     room_name: str
     max_players: int
+    age: int
     status: RoomStatus
     created_at: datetime
     started_at: Optional[datetime]
@@ -243,3 +247,17 @@ class UserAchievementDetailSchema(BaseModel):
     user_id: int
     achievement_id: int
     unlocked_at: datetime
+
+class GroupSchema(BaseModel):
+    id: int
+    group_name: str
+    group_image: str | None
+
+class ChatGroupSchema(BaseModel):
+    id: int
+    user_id: int
+    group_id: int
+    text: str | None
+    image: str | None
+    video: str | None
+    voice: str | None

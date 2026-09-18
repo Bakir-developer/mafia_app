@@ -1,8 +1,14 @@
 """empty message
 
-Revision ID: 094318648faa
+<<<<<<<< HEAD:migrations/versions/dbebdd6cff62_.py
+Revision ID: dbebdd6cff62
 Revises: 
-Create Date: 2026-09-10 13:31:55.162117
+Create Date: 2026-09-17 15:54:09.250728
+========
+Revision ID: d6970c13df62
+Revises: 
+Create Date: 2026-09-17 15:49:06.846255
+>>>>>>>> origin/bakir:migrations/versions/d6970c13df62_.py
 
 """
 from typing import Sequence, Union
@@ -12,7 +18,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '094318648faa'
+<<<<<<<< HEAD:migrations/versions/dbebdd6cff62_.py
+revision: str = 'dbebdd6cff62'
+========
+revision: str = 'd6970c13df62'
+>>>>>>>> origin/bakir:migrations/versions/d6970c13df62_.py
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -40,6 +50,13 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('refresh_token',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('token', sa.String(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user_profile.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('room',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -176,6 +193,7 @@ def downgrade() -> None:
     op.drop_table('user_statistics')
     op.drop_table('user_achievement')
     op.drop_table('room')
+    op.drop_table('refresh_token')
     op.drop_table('user_profile')
     op.drop_table('achievement')
     # ### end Alembic commands ###

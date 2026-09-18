@@ -30,7 +30,8 @@ class UserProfile(Base):
     game_participations: Mapped[list['GamePlayer']] = relationship('GamePlayer', back_populates='user', cascade='all, delete-orphan')
     achievements: Mapped[list['UserAchievement']] = relationship('UserAchievement', back_populates='user', cascade='all, delete-orphan')
     refresh_token: Mapped[List['RefreshToken']] = relationship('RefreshToken', back_populates='user', cascade='all, delete-orphan')
-
+    group: Mapped[List['Group']] = relationship(back_populates='group_member', cascade='all, delete-orphan')
+    chatgroup: Mapped[List['Chatgroup']] = relationship(back_populates='group_user', cascade='all, delete-orphan')
 
 class RefreshToken(Base):
     __tablename__ = 'refresh_token'
@@ -71,6 +72,7 @@ class Room(Base):
 
     room_name: Mapped[str] = mapped_column(String(100))
     max_players: Mapped[int] = mapped_column(SmallInteger)
+    age: Mapped[int] = mapped_column(SmallInteger)
     status: Mapped[RoomStatus] = mapped_column(Enum(RoomStatus), default=RoomStatus.WAITING)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -191,6 +193,8 @@ class GamePlayer(Base):
         foreign_keys="[NightAction.actor_id]", back_populates="actor", cascade="all, delete-orphan"
     )
 
+    has_sent_last_words: Mapped[bool] = mapped_column(Boolean, default=False)
+
     __table_args__ = (UniqueConstraint('game_id', 'user_id', name='uq_game_player_user'),)
 
 
@@ -270,3 +274,30 @@ class UserAchievement(Base):
     achievement: Mapped["Achievement"] = relationship(back_populates="users")
 
     __table_args__ = (UniqueConstraint('user_id', 'achievement_id', name='uq_user_achievement'),)
+
+class Group(Base):
+    __tablename__ = 'group'
+    id: Mapped[int ] = mapped_column(primary_key=True, autoincrement=True)
+    member_id: Mapped[int ] = mapped_column(ForeignKey('user_profile.id'))
+
+    group_name: Mapped[str] = mapped_column(String(30))
+    group_image: Mapped[str|None] = mapped_column(String)
+
+    group_member: Mapped['UserProfile'] = relationship('UserProfile', back_populates='group')
+
+    chatgroup: Mapped[List['Chatgroup']] = relationship(back_populates='group', cascade='all, delete-orphan')
+
+
+class Chatgroup(Base):
+    __tablename__ = 'chat_group'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user_profile.id'))
+    group_id: Mapped[int] = mapped_column(ForeignKey('group.id'))
+
+    text: Mapped[str|None] = mapped_column(String)
+    image: Mapped[str|None] = mapped_column(String)
+    video: Mapped[str|None] = mapped_column(String)
+    voice: Mapped[str|None] = mapped_column(String)
+
+    group_user: Mapped['UserProfile'] = relationship('UserProfile', back_populates='chatgroup')
+    group: Mapped['Group'] = relationship('Group', back_populates='chatgroup')
