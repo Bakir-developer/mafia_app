@@ -123,24 +123,13 @@ async def create_game(game_data: GameCreateSchema, db: Session = Depends(get_db)
     db.add(game_db)
     db.flush()
 
-    for room_player, role in zip(
-        room_players,
-        deck,
-    ):
+    for room_player, role in zip(room_players, deck,):
 
-        game_player = GamePlayer(
-            game_id=game_db.id,
-            user_id=room_player.user_id,
-            role=role,
-            is_alive=True,
-        )
+        game_player = GamePlayer(game_id=game_db.id, user_id=room_player.user_id, role=role, is_alive=True,)
 
         db.add(game_player)
 
-    game_round = GameRound(
-        game_id=game_db.id,
-        round_number=1,
-    )
+    game_round = GameRound(game_id=game_db.id, round_number=1,)
 
     db.add(game_round)
     room_db.status = RoomStatus.IN_PROGRESS

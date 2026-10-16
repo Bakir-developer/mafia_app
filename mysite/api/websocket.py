@@ -674,10 +674,7 @@ async def chat_endpoint(websocket: WebSocket, game_id: int, token: str):
 
     except Exception as e:
 
-        print(
-            "WEBSOCKET ERROR:",
-            repr(e)
-        )
+        print("WEBSOCKET ERROR:", repr(e))
 
         manager.disconnect(websocket, game_id)
 
