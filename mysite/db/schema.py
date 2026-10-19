@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Optional
-
 from pydantic import BaseModel, EmailStr
-
 from .models import UserRole, RoomStatus, GameRole, GamePhase, GameWinner, EliminationReason, NightActionType, AchievementCode
 
 
@@ -10,8 +8,8 @@ class UserProfileSchema(BaseModel):
     username:str
     email: EmailStr
     age:int
-    profile_image:Optional[str]
-    role: UserRole
+    profile_image:Optional[str] = None
+    role: Optional[UserRole] = None
     password: str
 
 class UserProfileUpdateSchema(BaseModel):
@@ -72,7 +70,7 @@ class RoomCreateSchema(BaseModel):
     room_name: str
     max_players: int
     age: int
-    owner_id: int
+    owner_id: Optional[int] = None
 
     mafia_count: int = 1
     doctor_count: int = 1
@@ -129,7 +127,7 @@ class RoomDetailSchema(BaseModel):
 
 class RoomPlayerCreateSchema(BaseModel):
     room_id: int
-    user_id: int
+    user_id: Optional[int] = None
 
 
 class RoomPlayerListSchema(BaseModel):
@@ -145,7 +143,7 @@ class RoomPlayerDetailSchema(BaseModel):
     user_id: int
 
 class ReviewCreateSchema(BaseModel):
-    user_id: int
+    user_id: Optional[int] = None
     room_id: int
     text: Optional[str] = None
     stars: int

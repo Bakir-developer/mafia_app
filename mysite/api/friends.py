@@ -9,7 +9,7 @@ from mysite.api.dependencies import get_current_user
 friend_router = APIRouter(prefix="/friend", tags=["Friend"])
 
 
-async def get_db():
+def get_db():
     db = SessionLocal()
     try:
         yield db
@@ -18,7 +18,7 @@ async def get_db():
 
 
 @friend_router.post("/add")
-async def add_friend(friend_data: FriendCreateSchema, db: Session = Depends(get_db),
+def add_friend(friend_data: FriendCreateSchema, db: Session = Depends(get_db),
                      current_user: UserProfile = Depends(get_current_user)):
     friend_id = friend_data.friend_id
 
@@ -49,7 +49,7 @@ async def add_friend(friend_data: FriendCreateSchema, db: Session = Depends(get_
 
 
 @friend_router.get("/list", response_model=list[FriendListSchema])
-async def get_friends(db: Session = Depends(get_db), current_user: UserProfile = Depends(get_current_user)):
+def get_friends(db: Session = Depends(get_db), current_user: UserProfile = Depends(get_current_user)):
     friends = db.query(Friend).filter(Friend.user_id == current_user.id).all()
 
     result = []
@@ -69,7 +69,7 @@ async def get_friends(db: Session = Depends(get_db), current_user: UserProfile =
 
 
 @friend_router.delete("/delete/{friend_id}")
-async def delete_friend(friend_id: int, db: Session = Depends(get_db),
+def delete_friend(friend_id: int, db: Session = Depends(get_db),
                         current_user: UserProfile = Depends(get_current_user)):
     friendship = db.query(Friend).filter(Friend.user_id == current_user.id,
                                          Friend.friend_id == friend_id).first()

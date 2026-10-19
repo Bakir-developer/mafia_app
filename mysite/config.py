@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError('SECRET_KEY is not set')
 
 ACCESS_EXPIRE_TOKEN=int(os.getenv('ACCESS_EXPIRE_TOKEN'))
 REFRESH_EXPIRE_TOKEN=int(os.getenv('REFRESH_EXPIRE_TOKEN'))
@@ -12,3 +14,9 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
+
+CORS_ORIGINS = ['http://localhost:3000']
+if FRONTEND_URL:
+    CORS_ORIGINS.append(FRONTEND_URL.rstrip('/'))
+CORS_ORIGINS += [o.strip().rstrip('/') for o in os.getenv('CORS_ORIGINS', '').split(',') if o.strip()]
+CORS_ORIGINS = list(dict.fromkeys(CORS_ORIGINS))

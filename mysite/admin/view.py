@@ -1,11 +1,14 @@
 from sqladmin import ModelView
-
 from mysite.db.models import (UserProfile, UserStatistic, Room, RoomPlayer,Review, Game,
-                              GamePlayer, GameRound,NightAction, Vote, Achievement, UserAchievement)
+                              GamePlayer, GameRound,NightAction, Vote, Achievement, UserAchievement,
+                              Friend, Group, Chatgroup)
 
 
 class UserProfileView(ModelView, model=UserProfile):
-    column_list = [UserProfile.id, UserProfile.username, UserProfile.email]
+    column_list = [UserProfile.id, UserProfile.username, UserProfile.email, UserProfile.role]
+    column_details_exclude_list = [UserProfile.password]
+    form_excluded_columns = [UserProfile.password]
+    can_create = False
 
 
 class UserStatisticView(ModelView, model=UserStatistic):
@@ -87,3 +90,13 @@ class UserAchievementView(ModelView, model=UserAchievement):
         UserAchievement.achievement_id,
         UserAchievement.unlocked_at
     ]
+
+
+class FriendView(ModelView, model=Friend):
+    column_list = [Friend.id, Friend.user_id, Friend.friend_id, Friend.created_at]
+
+class GroupView(ModelView, model=Group):
+    column_list = [Group.id, Group.member_id, Group.group_name]
+
+class ChatgroupView(ModelView, model=Chatgroup):
+    column_list = [Chatgroup.id, Chatgroup.user_id, Chatgroup.group_id, Chatgroup.text]

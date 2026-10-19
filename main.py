@@ -1,23 +1,49 @@
+import asyncio
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from mysite.admin.setup import setup_admin
 from mysite.api import (user_profile, auth, statistic, room, room_player, reviews,
                         game, night_action, websocket, friends)
-from mysite.admin.setup import setup_admin
-from fastapi.middleware.cors import CORSMiddleware
 from mysite.api.game import game_scheduler
-import asyncio
+from mysite.config import CORS_ORIGINS
+from mysite.db.database import SessionLocal
 
-Mafia_app = FastAPI(title='FastAPI Mafia_app')
+logger = logging.getLogger(__name__)
+
+def _seed_achievements():
+    db = SessionLocal()
+    try:
+        night_action.seed_achievements(db)
+    except Exception:
+        db.rollback()
+        logger.exception("Could not seed achievements (is the database migrated?)")
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await asyncio.to_thread(_seed_achievements)
+    scheduler_task = asyncio.create_task(game_scheduler())
+    try:
+        yield
+    finally:
+        scheduler_task.cancel()
+        try:
+            await scheduler_task
+        except asyncio.CancelledError:
+            pass
+
+Mafia_app = FastAPI(title='FastAPI Mafia_app', lifespan=lifespan)
 Mafia_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@Mafia_app.on_event("startup")
-async def start_scheduler():
-    asyncio.create_task(game_scheduler())
 
 Mafia_app.include_router(room.room_router)
 Mafia_app.include_router(room_player.room_player_router)
